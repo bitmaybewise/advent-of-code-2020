@@ -142,6 +142,12 @@ You glance back down at your bag and try to remember why you brought so many ada
 
 What is the total number of distinct ways you can arrange the adapters to connect the charging outlet to your device?
 
+13816758796288
+
+That's the right answer! You are one gold star closer to saving your vacation.
+
+You have completed Day 10!
+
 */
 package main
 
@@ -164,7 +170,7 @@ func answer1(n []int) int {
 	sort.Ints(n)
 
 	one, three := 0, 1
-	diff := func(a, b int) int {
+	diff := func(a, b int) {
 		d := a - b
 		if d == 1 {
 			one++
@@ -172,7 +178,6 @@ func answer1(n []int) int {
 		if d == 3 {
 			three++
 		}
-		return d
 	}
 	diff(n[0], 0)
 	for i := 1; i < len(n); i++ {
@@ -183,5 +188,39 @@ func answer1(n []int) int {
 }
 
 func answer2(n []int) int {
-	return 0
+	sort.Ints(n)
+	n = append([]int{0}, n...)
+	n = append(n, n[len(n)-1]+3)
+
+	limit := len(n) - 1
+	cache := make(map[int]int)
+	exists := func(idx int) bool {
+		return idx <= limit
+	}
+	var result func(int) int
+	result = func(idx int) int {
+		if cached, ok := cache[idx]; ok {
+			return cached
+		}
+		if idx == limit {
+			return 1
+		}
+		var count int
+		val := n[idx]
+		if exists(idx+1) && n[idx+1]-val <= 3 {
+			cache[idx+1] = result(idx + 1)
+			count += cache[idx+1]
+		}
+		if exists(idx+2) && n[idx+2]-val <= 2 {
+			cache[idx+2] = result(idx + 2)
+			count += cache[idx+2]
+		}
+		if exists(idx+3) && n[idx+3]-val <= 3 {
+			cache[idx+3] = result(idx + 3)
+			count += cache[idx+3]
+		}
+		return count
+	}
+
+	return result(0)
 }

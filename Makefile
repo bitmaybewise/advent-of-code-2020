@@ -1,3 +1,4 @@
+default: test
 test:
 	go test -race ./...
 test1:

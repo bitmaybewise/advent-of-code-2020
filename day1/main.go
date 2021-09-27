@@ -49,11 +49,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	ints := helper.LinesToInt(helper.ReadLinesFromInput("src/day1/input"))
+	ints := helper.LinesToInt(helper.ReadLinesFromInput("day1/input"))
 	fmt.Printf("Day 1-1: %d\n", answer1(ints))
 	fmt.Printf("Day 1-2: %d\n", answer2(ints))
 }

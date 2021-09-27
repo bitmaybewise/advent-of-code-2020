@@ -99,11 +99,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	content := helper.ReadLinesFromInput("src/day8/input")
+	content := helper.ReadLinesFromInput("day8/input")
 
 	fmt.Printf("Day 8-1: %d\n", answer1(content))
 	fmt.Printf("Day 8-2: %d\n", answer2(content))

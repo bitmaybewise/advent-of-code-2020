@@ -97,11 +97,11 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	content := helper.ReadLinesFromInput("src/day9/input")
+	content := helper.ReadLinesFromInput("day9/input")
 	numbers := helper.LinesToInt(content)
 
 	result1 := answer1(numbers, 25)

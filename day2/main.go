@@ -50,11 +50,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	lines := helper.ReadLinesFromInput("src/day2/input")
+	lines := helper.ReadLinesFromInput("day2/input")
 	passwords := createPasswordsFrom(lines)
 	fmt.Printf("Day 2-1: %d\n", answer1(passwords))
 	fmt.Printf("Day 2-1: %d\n", answer2(passwords))

@@ -155,11 +155,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	content := helper.ReadLinesFromInput("src/day10/input")
+	content := helper.ReadLinesFromInput("day10/input")
 	numbers := helper.LinesToInt(content)
 
 	fmt.Printf("Day 10-1: %d\n", answer1(numbers))

@@ -85,11 +85,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	grid := helper.ReadLinesFromInput("src/day3/input")
+	grid := helper.ReadLinesFromInput("day3/input")
 	fmt.Printf("Day 3-1: %d\n", answer1(grid))
 	fmt.Printf("Day 3-2: %d\n", answer2(grid))
 }

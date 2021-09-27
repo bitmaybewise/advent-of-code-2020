@@ -67,11 +67,11 @@ import (
 	"math"
 	"sort"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	content := helper.ReadLinesFromInput("src/day5/input")
+	content := helper.ReadLinesFromInput("day5/input")
 	bp := parseBP(content)
 
 	fmt.Printf("Day 5-1: %d\n", answer1(bp))

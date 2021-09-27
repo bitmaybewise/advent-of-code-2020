@@ -134,11 +134,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hlmerscher/advent-of-code-2020/src/helper"
+	"github.com/hlmerscher/advent-of-code-2020/helper"
 )
 
 func main() {
-	content := helper.ReadLinesFromInput("src/day4/input")
+	content := helper.ReadLinesFromInput("day4/input")
 	passports := parsePassports(content)
 
 	fmt.Printf("Day 4-1: %d\n", answer1(passports))

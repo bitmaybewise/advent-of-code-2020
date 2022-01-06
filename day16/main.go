@@ -69,6 +69,11 @@ Based on the nearby tickets in the above example, the first position must be row
 
 Once you work out which field is which, look for the six fields on your ticket that start with the word departure. What do you get if you multiply those six values together?
 
+3902565915559
+
+That's the right answer! You are one gold star closer to saving your vacation.
+
+You have completed Day 16!
 */
 package main
 
@@ -86,80 +91,101 @@ func main() {
 	fmt.Printf("Day 16-2: %d\n", answer2(content, 20, 25, 262, 22))
 }
 
-func answer1(content []string, headerSize, nearbyTicketsStart, nearbyTicketsEnd int) int {
-	_, valids := build(content, headerSize)
-	_, errorRate := nearby(content, valids, nearbyTicketsStart, nearbyTicketsEnd)
-	return errorRate
+func answer1(content []string, headerSize, nearbyTicketsStart, nearbyTicketsEnd int) (errorRate int) {
+	rules := buildRules(content, headerSize)
+
+	for _, line := range content[nearbyTicketsStart:nearbyTicketsEnd] {
+		for _, val := range strings.Split(line, ",") {
+			if n := toInt(val); !isValidField(n, rules) {
+				errorRate += n
+			}
+		}
+	}
+
+	return
 }
 
+// rewrote my initial solution using the one presented here https://0xdf.gitlab.io/adventofcode2020/16
 func answer2(content []string, headerSize, nearbyTicketsStart, nearbyTicketsEnd, yourTickets int) int {
-	mytickets := make([]int, 0)
-	values := strings.Split(content[yourTickets], ",")
-	for _, val := range values {
-		n := toInt(val)
-		mytickets = append(mytickets, n)
-	}
-	mapping := what(content, headerSize, nearbyTicketsStart, nearbyTicketsEnd)
-	sum := 1
-	for field, i := range mapping {
-		if strings.Contains(field, "departure") {
-			sum *= mytickets[i]
+	rules := buildRules(content, headerSize)
+
+	rows := content[nearbyTicketsStart:nearbyTicketsEnd]
+	valids := make([][]int, 0)
+	for _, v := range rows {
+		columns := strings.Split(v, ",")
+		validColumns := make([]int, 0)
+
+		for _, v := range columns {
+			if n := toInt(v); isValidField(n, rules) {
+				validColumns = append(validColumns, n)
+				continue
+			}
+			break
 		}
-		// if strings.Contains(field, "departure") {
-		// 	sum *= mytickets[i]
-		// }
-	}
-	return sum
-}
-
-type Set struct {
-	_data map[string]bool
-}
-
-func NewSet(fields map[string][]int) Set {
-	set := Set{_data: map[string]bool{}}
-	for k := range fields {
-		set.Add(k)
-	}
-	return set
-}
-
-func (s *Set) Add(i string) {
-	s._data[i] = true
-}
-
-func (s *Set) Del(i string) {
-	for k := range s._data {
-		if k == i {
-			delete(s._data, k)
+		if len(validColumns) == len(columns) {
+			valids = append(valids, validColumns)
 		}
 	}
-}
 
-func (s Set) Size() int {
-	return len(s._data)
-}
+	possibles := make(map[string][]int)
+	for name, bounds := range rules {
+		possibles[name] = make([]int, 0)
+		minrules := map[string][]int{
+			name: bounds,
+		}
 
-func (a Set) Intersection(b Set) Set {
-	s := NewSet(nil)
-	for k := range a._data {
-		if _, found := b._data[k]; found {
-			s.Add(k)
+		for i := 0; i < len(rules); i++ {
+			allValid := true
+			for _, t := range valids {
+				if !isValidField(t[i], minrules) {
+					allValid = false
+					break
+				}
+			}
+			if allValid {
+				possibles[name] = append(possibles[name], i)
+			}
 		}
 	}
-	return s
-}
 
-func (a Set) First() string {
-	for k := range a._data {
-		return k
+	type sortedPossibility struct {
+		name string
+		ints []int
 	}
-	return ""
+	columnSize := len(valids[0])
+	sorted := make([]sortedPossibility, columnSize)
+	for k, v := range possibles {
+		sorted[len(v)-1] = sortedPossibility{k, v}
+	}
+
+	matched := make(map[int]string)
+	for _, val := range sorted {
+		for _, n := range val.ints {
+			if _, ok := matched[n]; !ok {
+				matched[n] = val.name
+			}
+		}
+	}
+
+	mytickets := make([]int, columnSize)
+	for _, line := range content[yourTickets : yourTickets+1] {
+		for i, v := range strings.Split(line, ",") {
+			mytickets[i] = toInt(v)
+		}
+	}
+
+	product := 1
+	for k, v := range matched {
+		if strings.Contains(v, "departure") {
+			product *= mytickets[k]
+		}
+	}
+	return product
 }
 
-func contains(items []int, n int) bool {
-	for _, val := range items {
-		if val == n {
+func isValidField(v int, rules map[string][]int) bool {
+	for _, ints := range rules {
+		if ints[0] <= v && v <= ints[1] || ints[2] <= v && v <= ints[3] {
 			return true
 		}
 	}
@@ -174,89 +200,20 @@ func toInt(val string) int {
 	return n
 }
 
-func build(content []string, headerSize int) (fields map[string][]int, valids []int) {
-	fields = make(map[string][]int)
-	valids = make([]int, 0)
-
+func buildRules(content []string, headerSize int) map[string][]int {
+	rules := make(map[string][]int)
 	for _, line := range content[0:headerSize] {
 		values := strings.Split(line, ": ")
-		key := values[0]
-		fields[key] = make([]int, 0)
-
-		numbers := strings.Split(values[1], " or ")
-		for _, val := range numbers {
-			values := strings.Split(val, "-")
-			a := toInt(values[0])
-			b := toInt(values[1])
-			for ; a <= b; a++ {
-				fields[key] = append(fields[key], a)
-				valids = append(valids, a)
-			}
-		}
+		rules[values[0]] = make([]int, 4)
+		intrange := strings.Split(values[1], " or ")
+		ints := append(
+			strings.Split(intrange[0], "-"),
+			strings.Split(intrange[1], "-")...,
+		)
+		rules[values[0]][0] = toInt(ints[0])
+		rules[values[0]][1] = toInt(ints[1])
+		rules[values[0]][2] = toInt(ints[2])
+		rules[values[0]][3] = toInt(ints[3])
 	}
-
-	return
-}
-
-func nearby(content []string, valids []int, nearbyTicketsStart, nearbyTicketsEnd int) (validNearby [][]int, errorRate int) {
-	validNearby = make([][]int, nearbyTicketsEnd-nearbyTicketsStart)
-
-	for i, line := range content[nearbyTicketsStart:nearbyTicketsEnd] {
-		values := strings.Split(line, ",")
-		validNearby[i] = make([]int, 0)
-		for _, val := range values {
-			n := toInt(val)
-			if !contains(valids, n) {
-				errorRate += n
-				continue
-			}
-			validNearby[i] = append(validNearby[i], n)
-		}
-	}
-
-	return validNearby, errorRate
-}
-
-func what(content []string, headerSize, nearbyTicketsStart, nearbyTicketsEnd int) map[string]int {
-	fields, valids := build(content, headerSize)
-	validNearby, _ := nearby(content, valids, nearbyTicketsStart, nearbyTicketsEnd)
-
-	maxCol := len(validNearby)
-	maxRow := len(validNearby[0])
-	// mapping := make(map[int]string)
-	mapping := make(map[string]int)
-
-	for col := 0; col < maxCol; col++ {
-		set := NewSet(fields)
-
-		for i := 0; i < maxRow; i++ {
-			itemset := NewSet(nil)
-			for k := range fields {
-				if _, ok := mapping[k]; ok {
-					continue
-				}
-				if contains(fields[k], validNearby[i][col]) {
-					itemset.Add(k)
-				}
-			}
-			set = set.Intersection(itemset)
-		}
-
-		for k := range mapping {
-			set.Del(k)
-		}
-
-		if set.Size() > 1 {
-			panic(fmt.Sprintf("too many matches: %v", set))
-			// fmt.Println(fmt.Sprintf("too many matches: %v", set.Get()))
-		}
-		mapping[set.First()] = col
-		// mapping[col] = set.First()
-		// fmt.Println("intersection", set)
-	}
-	// for k, v := range mapping {
-	// 	fmt.Println(k, v)
-	// }
-
-	return mapping
+	return rules
 }
